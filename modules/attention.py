@@ -34,7 +34,34 @@ class CausalSelfAttention(nn.Module):
   def attention(self, key, query, value, attention_mask):
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # 1. Calculate the attention score
+    attn_score = torch.matmul(query, key.transpose(-2, -1))
+    attn_score = attn_score / (self.attention_head_size ** 0.5)
+
+    # 2. Causal mask: make sure each token only attends to previous tokens
+    seq_len = query.size(-2)
+    i = torch.arange(seq_len, device=query.device).view(seq_len, 1)
+    j = torch.arange(seq_len, device=query.device).view(1, seq_len)
+    causal_mask = j > i
+    attn_score = attn_score.masked_fill(causal_mask, float("-inf"))
+
+    # 3. Padding Mask: make sure padding tokens do not contribute to attention score
+    if attention_mask is not None:
+      attn_score = attn_score + attention_mask
+
+    # 4. Softmax
+    attn_score = torch.softmax(attn_score, dim=-1)
+
+    # 5. Dropout
+    attn_score = self.dropout(attn_score)
+
+    # 6. Value multiplication
+    attn_value = torch.matmul(attn_score, value)
+
+    # 7. Merge head
+    attn_value = rearrange(attn_value, 'b h t d -> b t (h d)')
+
+    return attn_value
 
 
   def forward(self, hidden_states, attention_mask):

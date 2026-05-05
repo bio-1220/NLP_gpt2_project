@@ -61,8 +61,9 @@ class SonnetGPT(nn.Module):
     not just the distribution over next tokens for the last token!
     """
     ### YOUR CODE HERE
-    raise NotImplementedError
-
+    output = self.gpt(input_ids=input_ids, attention_mask=attention_mask)
+    logits = self.gpt.hidden_state_to_token(output["last_hidden_state"])
+    return logits
 
   def get_device(self):
     for param in self.gpt.parameters():
