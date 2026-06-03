@@ -51,7 +51,9 @@ class ParaphraseGPT(nn.Module):
   def __init__(self, args):
     super().__init__()
     self.gpt = GPT2Model.from_pretrained(model=args.model_size, d=args.d, l=args.l, num_heads=args.num_heads)
-    self.paraphrase_detection_head = nn.Linear(args.d, 2)  # Paraphrase detection has two outputs: 1 (yes) or 0 (no).
+    # The model predicts the answer token ("yes"=8505 / "no"=3919) over the full vocabulary
+    # using GPT-2's weight-tied LM head, so labels (token ids) and argmax predictions live in the
+    # same space (see datasets.ParaphraseDetectionDataset and evaluation.model_eval_paraphrase).
 
     # By default, fine-tune the full model.
     for param in self.gpt.parameters():
@@ -74,7 +76,7 @@ class ParaphraseGPT(nn.Module):
     ### YOUR CODE HERE
     outputs = self.gpt(input_ids=input_ids, attention_mask=attention_mask)
     last_token = outputs["last_token"]
-    logits = self.paraphrase_detection_head(last_token) 
+    logits = self.gpt.hidden_state_to_token(last_token)
     return logits
 
 
@@ -154,7 +156,7 @@ def train(args):
 def test(args):
   """Evaluate your model on the dev and test datasets; save the predictions to disk."""
   device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
-  saved = torch.load(args.filepath)
+  saved = torch.load(args.filepath, weights_only=False)
 
   model = ParaphraseGPT(saved['args'])
   model.load_state_dict(saved['model'])

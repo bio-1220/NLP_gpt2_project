@@ -1,0 +1,11 @@
+===== [2/3] PARAPHRASE DETECTION (Quora, full fine-tune) =====
+Traceback (most recent call last):
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\paraphrase_detection.py", line 237, in <module>
+    train(args)
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\paraphrase_detection.py", line 100, in train
+    para_train_data = load_paraphrase_data(args.para_train)
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\datasets.py", line 112, in load_paraphrase_data
+    for record in csv.DictReader(fp, delimiter='\t'):
+  File "C:\Users\user\anaconda3\envs\NLP_Project\lib\csv.py", line 111, in __next__
+    row = next(self.reader)
+UnicodeDecodeError: 'cp949' codec can't decode byte 0xe2 in position 3228: illegal multibyte sequence

@@ -1,0 +1,106 @@
+===== [3/3] SONNET GENERATION (full fine-tune) =====
+train-0:   0%|          | 0/17 [00:00<?, ?it/s]train-0:   6%|5         | 1/17 [00:00<00:03,  4.01it/s]train-0:  18%|#7        | 3/17 [00:00<00:01,  7.76it/s]train-0:  29%|##9       | 5/17 [00:00<00:01,  9.33it/s]train-0:  41%|####1     | 7/17 [00:00<00:00, 10.45it/s]train-0:  53%|#####2    | 9/17 [00:00<00:00, 11.04it/s]train-0:  65%|######4   | 11/17 [00:01<00:00, 11.15it/s]train-0:  76%|#######6  | 13/17 [00:01<00:00, 11.10it/s]train-0:  88%|########8 | 15/17 [00:01<00:00, 11.51it/s]train-0: 100%|##########| 17/17 [00:01<00:00, 12.57it/s]train-0: 100%|##########| 17/17 [00:01<00:00, 10.85it/s]
+Epoch 0: train loss :: 5.047.
+Generating several output sonnets...
+Those lips that Love's own hand did make
+Breathed forth the sound that said "I hate"
+To me that languished for her sake;se lips that Love's own hand did make
+Breathed forth the sound that said "I hate"
+To me that languished for her sake; she"Shybb/(x]featumes
+Deathing mad dinse those resurrector's face like solemn thunderblast When that word danced to such concourse Upon a lonely, sighing heart Mount'd trest for grief
+
+
+Poor soul, the center of my sinful earth,
+Pressed with these rebel powers that thee array,
+Why dost thou pine within and suffer dearth,r soul, the center of my sinful earth,
+Pressed with these rebel powers that thee array,
+Why dost thou pine within and suffer dearth,
+Doth to know hateful thine foes deserve root?
+
+
+This wondrous were creep, and oppressed of love [and mercy] mid the great
+Christ's weeping exclaim,
+
+
+There languid dreaming slew and wounded¡¦
+
+Dark orbs of mine dark day escaped their brightness,
+
+And eminfied in silver cluttered under their lofty scales!
+
+
+My love is as a fever, longing still
+For that which longer nurseth the disease,
+Feeding on that which doth preserve the ill,love is as a fever, longing still
+For that which longer nurseth the disease,
+Feeding on that which doth preserve the ill, none
+Whilst ignoring the scorn to cast away,
+Of creeping obscures the wit a curse may keep against;
+Who solemnly sign who be his ensign nor ensigned to your turn.
+
+
+O me, what eyes hath love put in my head,
+Which have no correspondence with true sight!
+Or if they have, where is my judgment fled,e, what eyes hath love put in my head,
+Which have no correspondence with true sight!
+Or if they have, where is my judgment fled,
+But mine eyes so provide what no evil hither directed. I refuse,
+Of long with little reason to this illness.
+Sin gratifies riches: following In thought shall my darkness be frighted; though vile this way, far-drier I dress.
+The lighter you brighte clear your light round your utmost darts and gleaces, but man close fast, well saves you of thence:
+But that many safe, trusting glory perish'st Your way.
+
+
+Canst thou, O cruel, say I love thee not
+When I against myself with thee partake?
+Do I not think on thee when I forgotst thou, O cruel, say I love thee not
+When I against myself with thee partake?
+Do I not think on thee when I forgot thou!
+
+
+O, from what power hast thou this powerful might
+With insufficiency my heart to sway?
+To make me give the lie to my true sight,from what power hast thou this powerful might
+With insufficiency my heart to sway?
+To make me give the lie to my true sight,
+Warrant faithfully to send and vindicate, Thy daughter along your trusted scourges.
+
+
+Love is too young to know what conscience is;
+Yet who knows not conscience is born of love?
+Then, gentle cheater, urge not my amiss,e is too young to know what conscience is;
+Yet who knows not conscience is born of love?
+Then, gentle cheater, urge not my amiss,
+For fear it nothing, hold my guilt up before my violent heart...
+
+
+In loving thee thou know'st I am forsworn,
+But thou art twice forsworn, to me love swearing;
+In act thy bed-vow broke, and new faith tornloving thee thou know'st I am forsworn,
+But thou art twice forsworn, to me love swearing;
+In act thy bed-vow broke, and new faith torn me from the light."
+
+
+Wood has ribald and goddess maidens. To which things resist the remorseless mon a trickless flower sing: glad at losing sense: passion ressful for the fugan so makes his life,
+Imperial country a city lives when far past riches, eastern dear blood, millfield strife seires rich leagues; yesterday cloudured the Arc so booty, last for nothing, lightning fix before new dominion.
+
+
+O Lord Arthur thought how deeply must thank him he drew so base this name, haunted court, foolish servant of Elvond. Like Hercules : contempt mirrored by gravest
+
+
+Cupid laid by his brand and fell asleep.
+A maid of Dian's this advantage found,
+And his love-kindling fire did quickly steepid laid by his brand and fell asleep.
+A maid of Dian's this advantage found,
+And his love-kindling fire did quickly steep;
+Received with entreaties his small mortal poop,
+Do nothing strong show, nor strong substitute hunger,
+When incantations set deep day die.
+
+
+Traceback (most recent call last):
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\sonnet_generation.py", line 268, in <module>
+    train(args)
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\sonnet_generation.py", line 183, in train
+    print(f'{batch[1]}{output[1]}\n\n')
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2014' in position 328: illegal multibyte sequence

@@ -1,0 +1,29 @@
+===== [2/3] PARAPHRASE DETECTION (Quora, full fine-tune) =====
+Loaded 283003 train examples from data/quora-train.csv
+Loaded 40429 train examples from data/quora-dev.csv
+train-0:   0%|          | 0/35376 [00:00<?, ?it/s]C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [0,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [1,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [2,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [3,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [4,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [5,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [6,0,0] Assertion `t >= 0 && t < n_classes` failed.
+C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\cuda\Loss.cu:245: block: [0,0,0], thread: [7,0,0] Assertion `t >= 0 && t < n_classes` failed.
+train-0:   0%|          | 0/35376 [00:04<?, ?it/s]
+Traceback (most recent call last):
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\paraphrase_detection.py", line 237, in <module>
+    train(args)
+  File "C:\Users\user\Onedrive\Desktop\NLP_Project\NLP_gpt2_project\paraphrase_detection.py", line 136, in train
+    loss.backward()
+  File "C:\Users\user\anaconda3\envs\NLP_Project\lib\site-packages\torch\_tensor.py", line 631, in backward
+    torch.autograd.backward(
+  File "C:\Users\user\anaconda3\envs\NLP_Project\lib\site-packages\torch\autograd\__init__.py", line 381, in backward
+    _engine_run_backward(
+  File "C:\Users\user\anaconda3\envs\NLP_Project\lib\site-packages\torch\autograd\graph.py", line 869, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+torch.AcceleratorError: CUDA error: unknown error
+Search for `cudaErrorUnknown' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
