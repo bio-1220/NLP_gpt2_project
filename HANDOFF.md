@@ -1,89 +1,46 @@
-# Training Handoff
+# Experiment Handoff
 
-이 문서는 데이터/전처리 담당 단계에서 학습 담당자에게 넘기는 handoff 문서입니다. 현재 레포는 **외부 데이터 준비와 모델-비의존 glue layer**까지 준비된 상태입니다. 실제 학습/평가 스크립트는 아직 작성해야 합니다.
+이 문서는 데이터/코드 담당자가 GPU 학습 담당자에게 넘기는 실행 규격이다.
+세부 연구 배경은 `proposal.md`에 두고, 여기서는 바로 학습과 평가에 필요한
+파일, 필드, 우선순위만 정리한다.
 
-## 1. 현재 완료된 것
+## 1. Goal
 
-### 데이터 전처리
-
-다음 외부 데이터셋을 다운로드하고 `data/processed/` 아래 JSONL로 변환하는 스크립트를 추가했습니다.
-
-```text
-scripts/prepare_external_data.py
-```
-
-처리 대상:
-
-| 용도 | 데이터셋 | 출력 |
-|---|---|---|
-| 영어 감정 분류 | `dair-ai/emotion` | `emotion_en_{train,dev,test}.jsonl` |
-| 한국어 감정 분류 | KOTE strict 6-class subset | `emotion_ko_{train,dev,test}.jsonl` |
-| 한국어 시 생성 | KPoEM line-level 재구성 | `poem_ko_{train,dev,test}.jsonl` |
-
-외부 raw/processed 데이터는 repo에 커밋하지 않습니다. `.gitignore`에 포함되어 있습니다.
-
-### 실험 glue utilities
-
-모델 checkpoint 형식과 무관하게 쓸 수 있는 공통 유틸을 추가했습니다.
+현재 핵심 질문은 다음과 같다.
 
 ```text
-experiments/data_bridge.py
-experiments/prompts.py
-experiments/metrics.py
-scripts/smoke_test_data_bridge.py
+감정 정보가 GPT-2 계열 모델의 시 continuation 성능에 도움이 되는가?
 ```
 
-이 유틸들은 아직 학습을 수행하지 않습니다. 학습 코드가 읽을 데이터 포맷, prompt 포맷, 평가 포맷을 고정하는 역할입니다.
+초기 실험에서는 global emotion prefix와 emotion SFT가 CHRF를 뚜렷하게
+개선하지 못했다. 따라서 추가 실험은 새 주제로 갈아타기보다, 실패 원인을
+분해하는 진단 실험으로 둔다.
 
-## 2. 데이터 재생성 방법
+## 2. Data Setup
 
-처음 clone한 환경에서는 `data/processed/`가 없으므로 아래 명령을 실행해야 합니다.
+외부 데이터는 git에 올리지 않는다. 새 환경에서는 아래 명령으로 다시 만든다.
 
 ```powershell
 py -3 scripts\prepare_external_data.py
 ```
 
-생성 결과 예시:
+기본 출력:
 
 ```text
-data/processed/emotion_en_train.jsonl
-data/processed/emotion_en_dev.jsonl
-data/processed/emotion_en_test.jsonl
-
-data/processed/emotion_ko_train.jsonl
-data/processed/emotion_ko_dev.jsonl
-data/processed/emotion_ko_test.jsonl
-
-data/processed/poem_ko_train.jsonl
-data/processed/poem_ko_dev.jsonl
-data/processed/poem_ko_test.jsonl
+data/processed/emotion_en_{train,dev,test}.jsonl
+data/processed/emotion_ko_{train,dev,test}.jsonl
+data/processed/poem_ko_{train,dev,test}.jsonl
 ```
 
-데이터 bridge가 정상 동작하는지 확인:
+간단한 schema check:
 
 ```powershell
 py -3 scripts\smoke_test_data_bridge.py
 ```
 
-현재 smoke test에서 확인된 count:
+## 3. Common Schemas
 
-```text
-emotion_en_train: 16000
-emotion_ko_train: 11880
-poem_ko_train: 368
-CHRF identity check: 100.0
-```
-
-## 3. Processed Dataset Schema
-
-### 3.1 Emotion Classification JSONL
-
-파일:
-
-```text
-data/processed/emotion_en_{train,dev,test}.jsonl
-data/processed/emotion_ko_{train,dev,test}.jsonl
-```
+### Emotion Classification
 
 공통 label set:
 
@@ -96,284 +53,148 @@ data/processed/emotion_ko_{train,dev,test}.jsonl
 5 surprise
 ```
 
-예시:
-
-```json
-{
-  "id": "48132",
-  "text": "ㅋ 난 삼겹살먹고, 들어가는중~~ 좀있다봐",
-  "label": "joy",
-  "label_id": 1,
-  "source_labels": ["기쁨", "즐거움/신남"],
-  "target_label_counts": {"joy": 10, "love": 2},
-  "target_rater_votes": {"joy": 4},
-  "prompt_label_ko": "기쁨"
-}
-```
-
-학습에는 보통 `text`, `label_id`만 쓰면 됩니다. 나머지는 분석/검증용 metadata입니다.
-
-### 3.2 Korean Poem Continuation JSONL
-
-파일:
+주요 필드:
 
 ```text
-data/processed/poem_ko_{train,dev,test}.jsonl
+text
+label
+label_id
 ```
 
-예시:
+### Poem Continuation
 
-```json
-{
-  "id": "kpoem-5",
-  "poem_id": 5,
-  "title": "또 다른 고향",
-  "poet": "윤동주",
-  "prefix": "고향에 돌아온 날 밤에\n내 백골(白骨)이 따라와 한방에 누웠다.\n어둔 방은 우주로 통하고",
-  "target": "하늘에선가 소리처럼 바람이 불어 온다.\n...",
-  "full_text": "고향에 돌아온 날 밤에\n...",
-  "num_lines": 17,
-  "emotion_metadata": {}
-}
-```
-
-학습 방식은 두 가지 중 하나를 선택할 수 있습니다.
+주요 필드:
 
 ```text
-1. full_text 전체 LM fine-tuning
-2. prefix 이후 target token에만 loss를 주는 continuation fine-tuning
+prefix    -> 첫 3줄
+target    -> 나머지 줄
+full_text -> 전체 시
 ```
 
-처음 baseline은 `full_text` 전체 LM fine-tuning이 가장 단순합니다. 과제의 continuation setting에 더 정확히 맞추려면 `prefix` 부분 loss masking을 추가하면 됩니다.
-
-## 4. 전처리 정책 요약
-
-### 4.1 영어 emotion
-
-`dair-ai/emotion`을 그대로 사용합니다.
+조건부 generation 파일에는 다음 필드가 추가된다.
 
 ```text
-sadness, joy, love, anger, fear, surprise
+model_input           -> test-time generation prompt
+conditioned_full_text -> LM fine-tuning text
+target                -> reference continuation
 ```
 
-### 4.2 한국어 emotion
+## 4. Recommended Run Priority
 
-KOTE는 원래 43-class multi-label dataset입니다. 영어 데이터셋과 맞추기 위해 strict 6-class single-label subset으로 변환했습니다.
+시간이 부족하면 아래 순서대로만 돌린다.
 
-최종 mapping:
+| Priority | Experiment | Files |
+|---|---|---|
+| 1 | Korean baseline | `poem_ko_{split}.jsonl` |
+| 2 | KPoEM line oracle trajectory | `poem_ko_{split}_line_traj.jsonl` |
+| 3 | KPoEM line average trajectory | `poem_ko_{split}_line_traj_avg.jsonl` |
+| 4 | KPoEM line random trajectory | `poem_ko_{split}_line_traj_random.jsonl` |
+| 5 | Shakespeare Method A oracle | `sonnet_en_{split}_sent_oracle_cont.jsonl` |
+| 6 | Shakespeare Method B average | `sonnet_en_{split}_sent_avg_cont.jsonl` |
 
-| Target | KOTE labels |
-|---|---|
-| sadness | 슬픔, 서러움, 절망 |
-| joy | 기쁨, 행복, 즐거움/신남 |
-| love | 아껴주는, 환영/호의 |
-| anger | 화남/분노, 짜증, 증오/혐오 |
-| fear | 공포/무서움, 불안/걱정 |
-| surprise | 놀람, 경악, 당황/난처 |
+KPoEM line trajectory가 가장 중요하다. 이 실험은 global emotion label이 너무
+coarse해서 실패했는지, line-level 구조화된 감정 흐름은 도움이 되는지 확인한다.
 
-Strict filtering:
+## 5. Diagnostic Data Builders
 
-```text
-1. rater별 label을 6-class target으로 변환
-2. 한 rater 안에서 여러 target class로 갈라지면 그 rater vote 제외
-3. 최소 3명 이상이 같은 target class에 동의한 sample만 keep
-4. 최다 class 동률이면 drop
-```
+### KPoEM Oracle Emotion
 
-주의: KOTE는 온라인 댓글 데이터라 텍스트 도메인이 시와 다릅니다. 이 점은 report limitation에 써야 합니다.
-
-### 4.3 한국어 poem
-
-KPoEM poem-level 파일은 줄바꿈이 사라진 문단 형태라 첫 3행 continuation task에 바로 쓸 수 없습니다. 따라서 line-level 파일을 받아 `poem_id` 기준으로 행을 재구성했습니다.
-
-```text
-prefix = first 3 lines
-target = remaining lines
-```
-
-KPoEM emotion labels는 main training에는 쓰지 않습니다. `emotion_metadata`로만 보존합니다.
-
-## 5. Glue Utility 사용법
-
-### 5.1 Emotion dataset loader
-
-```python
-from experiments.data_bridge import EmotionJsonlDataset
-
-dataset = EmotionJsonlDataset("data/processed/emotion_ko_train.jsonl")
-example = dataset[0]
-
-text = example["text"]
-label_id = example["label_id"]
-```
-
-Tokenizer가 있을 경우:
-
-```python
-batch = dataset.collate_fn([dataset[0], dataset[1]], tokenizer=tokenizer, max_length=128)
-
-input_ids = batch["token_ids"]
-attention_mask = batch["attention_mask"]
-labels = batch["labels"]
-```
-
-### 5.2 Poem continuation loader
-
-```python
-from experiments.data_bridge import PoemContinuationJsonlDataset
-
-dataset = PoemContinuationJsonlDataset("data/processed/poem_ko_train.jsonl")
-example = dataset[0]
-
-prefix = example["prefix"]
-target = example["target"]
-full_text = example["full_text"]
-```
-
-### 5.3 Emotion prefix prompt
-
-```python
-from experiments.prompts import build_emotion_prompt
-
-prompt = build_emotion_prompt(prefix, "sadness", language="ko")
+```powershell
+py -3 scripts\prepare_kpoem_oracle_emotion.py
 ```
 
 출력:
 
 ```text
-[감정: 슬픔]
-<첫 3행>
+poem_ko_{train,dev,test}_oracle.jsonl
+emotion_kpoem_prefix_{train,dev,test}.jsonl
+kpoem_oracle_emotion_summary.json
 ```
 
-영어:
+용도:
 
-```python
-prompt = build_emotion_prompt(prefix, "sadness", language="en")
+```text
+emotion_kpoem_prefix_* -> KOTE-trained classifier가 KPoEM 감정을 맞히는지 확인
+poem_ko_*_oracle      -> oracle global emotion prefix generation
+```
+
+### KPoEM Line-Level Emotion Trajectory
+
+```powershell
+py -3 scripts\prepare_kpoem_line_trajectory.py
 ```
 
 출력:
 
 ```text
-[emotion: sadness]
-<first 3 lines>
+poem_ko_{train,dev,test}_line_traj.jsonl
+poem_ko_{train,dev,test}_line_traj_avg.jsonl
+poem_ko_{train,dev,test}_line_traj_random.jsonl
+kpoem_line_trajectory_summary.json
 ```
 
-### 5.4 CHRF metric
-
-```python
-from experiments.metrics import chrf_corpus_score
-
-score = chrf_corpus_score(hypotheses, references)
-```
-
-`sacrebleu`가 설치되어 있으면 정식 CHRF를 사용합니다. 없으면 fallback character n-gram F-score를 사용합니다. 최종 report 실험에서는 가능하면 `sacrebleu`를 설치하고 정식 CHRF를 쓰는 것을 권장합니다.
-
-## 6. 다음에 구현해야 할 것
-
-현재 아직 없는 학습/평가 스크립트:
+사용법:
 
 ```text
-train_emotion.py
-train_poem.py
-evaluate_generation.py
-checkpoint adapter
+fine-tuning text: conditioned_full_text
+test-time prompt: model_input
+reference: target
 ```
 
-추천 구현 순서:
+### Shakespeare Sentiment Trajectory Method A/B
 
-1. `train_emotion.py`
-   - 영어: GPT-2 backbone + 6-class classifier
-   - 한국어: KoGPT2 backbone + 6-class classifier
-   - class imbalance가 있으므로 class weight 고려
+```powershell
+py -3 scripts\prepare_shakespeare_sentiment_trajectory.py --continuous
+```
 
-2. `train_poem.py`
-   - 영어: 기존 sonnet generation baseline과 연결
-   - 한국어: `skt/kogpt2-base-v2` + KPoEM continuation
-   - baseline은 poem SFT only
-
-3. `evaluate_generation.py`
-   - generated continuation 저장
-   - reference target과 CHRF 계산
-   - output JSONL 저장
-
-4. Emotion prefix experiment
-   - emotion classifier로 prefix의 emotion 예측
-   - `[emotion: label]` 또는 `[감정: label]`을 붙여 generation
-   - random emotion prefix control도 같이 구현
-
-5. Sequential SFT experiment
-   - emotion classifier fine-tuned checkpoint에서 shared backbone만 가져오기
-   - generation LM head로 poem SFT 진행
-
-## 7. Checkpoint 담당자에게 필요한 정보
-
-학습 담당자가 영어 GPT-2 checkpoint를 넘겨받을 때 반드시 확인해야 할 것:
+출력:
 
 ```text
-1. checkpoint 파일 경로
-2. checkpoint 형식
-   - 우리 GPT2Model state_dict인지
-   - HuggingFace GPT2LMHeadModel인지
-   - classifier head까지 포함되어 있는지
-3. tokenizer
-   - gpt2 그대로인지
-   - custom tokenizer인지
-4. model size
-   - hidden size
-   - number of layers
-   - number of heads
-5. checkpoint가 어떤 task로 학습된 것인지
-   - pretrain only
-   - sentiment/emotion fine-tuned
-   - sonnet generation fine-tuned
+sonnet_en_{train,dev,heldout}_sent_oracle_cont.jsonl
+sonnet_en_{train,dev,heldout}_sent_avg_cont.jsonl
+shakespeare_sentiment_trajectory_summary_cont.json
 ```
 
-이 정보가 없으면 adapter를 확정하기 어렵습니다.
-
-## 8. 실험 Matrix
-
-최종적으로 목표하는 실험:
-
-| ID | Language | Setup | Purpose |
-|---|---|---|---|
-| E0 | English | Sonnet SFT only | 영어 baseline |
-| E1 | English | Predicted emotion prefix | emotion conditioning |
-| E2 | English | Random emotion prefix | prefix control |
-| E3 | English | Emotion SFT -> Sonnet SFT | representation transfer |
-| K0 | Korean | KPoEM SFT only | 한국어 baseline |
-| K1 | Korean | Predicted emotion prefix | emotion conditioning |
-| K2 | Korean | Random emotion prefix | prefix control |
-| K3 | Korean | KOTE SFT -> KPoEM SFT | representation transfer |
-
-## 9. 평가 관련 주의
-
-Main metric은 CHRF입니다. 다만 시 생성은 open-ended task이므로 CHRF만으로 시적 품질을 완전히 평가할 수 없습니다.
-
-Report limitation에 넣을 내용:
+의미:
 
 ```text
-CHRF measures reference similarity, not overall poetic quality. A generated poem
-can be fluent and emotionally consistent while receiving a low CHRF score if it
-differs from the reference continuation.
+Method A oracle -> 각 sonnet의 gold 14-line sentiment trajectory를 prefix로 사용
+Method B average -> train 평균 sentiment trajectory를 모든 sonnet에 공통 prefix로 사용
 ```
 
-가능하면 future work로 다음을 언급합니다.
+주의:
 
 ```text
-human preference evaluation
-LLM-as-a-judge
-emotion consistency
-diversity metrics such as Distinct-n or self-BLEU
+heldout split은 target이 비어 있다.
+dev split은 TRUE_sonnets_held_out_dev.txt에서 target을 가진다.
+default discrete 평균은 거의 0으로 반올림되므로 `_cont` 사용을 우선 추천한다.
+Method C predicted planner는 별도 모델과 leakage 관리가 필요하므로 이번 handoff 범위 밖이다.
 ```
 
-## 10. 현재 Git에서 추적하지 않는 데이터
+## 6. Evaluation
 
-다음 경로는 `.gitignore`되어 있습니다.
+기본 metric은 CHRF다.
+
+비교는 같은 decoding setting에서 진행한다.
 
 ```text
-data/raw/
-data/processed/
+baseline vs oracle trajectory
+oracle trajectory vs average trajectory
+oracle trajectory vs random trajectory
 ```
 
-따라서 clone 후 반드시 전처리 명령을 다시 실행해야 합니다.
+가능하면 per-poem CHRF도 저장한다. 평균 점수만 있으면 작은 데이터셋에서
+해석이 흔들릴 수 있다.
+
+## 7. Storyline
+
+발표에서는 모든 실험을 다 나열하기보다 아래 흐름으로 묶는다.
+
+```text
+1. Emotion supervision이 poem continuation에 도움이 될 것이라고 가정했다.
+2. Global emotion prefix와 sequential SFT는 CHRF를 개선하지 못했다.
+3. 실패 원인을 보기 위해 더 구조화된 line-level trajectory를 실험한다.
+4. Oracle/average/random 비교로 "감정 내용"과 "prefix 형식"을 분리한다.
+5. 결론은 감정 분류 능력이 곧바로 생성 제어 능력으로 이어지지는 않는다는 것이다.
+```
 
