@@ -72,6 +72,60 @@ def distribution(values: list[str]) -> dict[str, int]:
     return dict(Counter(values))
 
 
+# ---------------------------------------------------------------------------
+# Diversity / trajectory metrics (full-tier evaluation)
+# ---------------------------------------------------------------------------
+
+# valence map for the shared 6-class emotion space (KO trajectory comparison)
+EMOTION_VALENCE = {"joy": 1.0, "love": 1.0, "surprise": 0.0, "sadness": -1.0, "anger": -1.0, "fear": -1.0}
+
+
+def distinct_n(text: str, n: int = 2) -> float:
+    """Unique-n-gram ratio over whitespace tokens (1.0 = no repetition)."""
+    tokens = text.split()
+    if len(tokens) < n:
+        return 1.0 if tokens else 0.0
+    ngrams = [tuple(tokens[i : i + n]) for i in range(len(tokens) - n + 1)]
+    return len(set(ngrams)) / len(ngrams)
+
+
+def trajectory_mse(gen: list[float], ref: list[float]) -> float | None:
+    n = min(len(gen), len(ref))
+    if n == 0:
+        return None
+    return sum((g - r) ** 2 for g, r in zip(gen[:n], ref[:n])) / n
+
+
+def trajectory_correlation(gen: list[float], ref: list[float]) -> float | None:
+    """Pearson correlation over aligned positions (None if undefined)."""
+    n = min(len(gen), len(ref))
+    if n < 2:
+        return None
+    g, r = gen[:n], ref[:n]
+    mg, mr = sum(g) / n, sum(r) / n
+    cov = sum((a - mg) * (b - mr) for a, b in zip(g, r))
+    vg = sum((a - mg) ** 2 for a in g) ** 0.5
+    vr = sum((b - mr) ** 2 for b in r) ** 0.5
+    if vg == 0.0 or vr == 0.0:
+        return None
+    return cov / (vg * vr)
+
+
+def volta_position(trajectory: list[float]) -> int | None:
+    """1-based index of the largest line-to-line sentiment change."""
+    if len(trajectory) < 2:
+        return None
+    deltas = [abs(trajectory[i + 1] - trajectory[i]) for i in range(len(trajectory) - 1)]
+    return deltas.index(max(deltas)) + 1
+
+
+def volta_distance(gen: list[float], ref: list[float]) -> int | None:
+    vg, vr = volta_position(gen), volta_position(ref)
+    if vg is None or vr is None:
+        return None
+    return abs(vg - vr)
+
+
 def generation_records(
     examples: list[dict[str, Any]],
     hypotheses: list[str],

@@ -1,0 +1,15 @@
+{
+  "gen_file": "results/gen_K_r30_orc.jsonl",
+  "lang": "ko",
+  "n_records": 47,
+  "metrics": {
+    "chrf": 7.459757067626663,
+    "distinct1": 0.9159914975338102,
+    "distinct2": 0.9972313531766541,
+    "bertscore_f1": 0.6250969957798085,
+    "traj_mse": 1.3886683791729573,
+    "traj_corr": 0.01687322044990751,
+    "volta_dist": 1.7730496453900708,
+    "line_emotion_agreement": 0.3185368659341059
+  }
+}

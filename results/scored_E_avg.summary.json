@@ -1,0 +1,14 @@
+{
+  "gen_file": "results/gen_E_avg.jsonl",
+  "lang": "en",
+  "n_records": 12,
+  "metrics": {
+    "chrf": 24.75201634361959,
+    "distinct1": 0.5161056875750103,
+    "distinct2": 0.7807616086693628,
+    "bertscore_f1": 0.8261827164226108,
+    "traj_mse": 1.7805930061726378,
+    "traj_corr": 0.01660009075040725,
+    "volta_dist": 3.4166666666666665
+  }
+}

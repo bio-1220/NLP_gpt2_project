@@ -1,0 +1,15 @@
+{
+  "gen_file": "results/gen_K_r70_rnd.jsonl",
+  "lang": "ko",
+  "n_records": 47,
+  "metrics": {
+    "chrf": 5.818316100360231,
+    "distinct1": 0.9360878669165745,
+    "distinct2": 0.9983760688979098,
+    "bertscore_f1": 0.6118444948331684,
+    "traj_mse": 1.5199714783602538,
+    "traj_corr": 0.15589061453590897,
+    "volta_dist": 1.127659574468085,
+    "line_emotion_agreement": 0.254431646254484
+  }
+}

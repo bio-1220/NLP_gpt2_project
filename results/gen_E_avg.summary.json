@@ -1,0 +1,15 @@
+{
+  "setup_id": "E_avg",
+  "lang": "en",
+  "ckpt": "poem_en_E_avg.pt",
+  "eval_n": 12,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 24.75201634361959,
+  "chrf_full_poem": 40.03327059506157
+}

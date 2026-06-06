@@ -1,0 +1,15 @@
+{
+  "setup_id": "K_r30_avg",
+  "lang": "ko",
+  "ckpt": "poem_ko_K_r30_avg.pt",
+  "eval_n": 47,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 7.587264436693356,
+  "chrf_full_poem": 27.023760592020217
+}

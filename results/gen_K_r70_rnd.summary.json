@@ -1,0 +1,15 @@
+{
+  "setup_id": "K_r70_rnd",
+  "lang": "ko",
+  "ckpt": "poem_ko_K_r70_rnd.pt",
+  "eval_n": 47,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 5.818316100360231,
+  "chrf_full_poem": 52.87246254113581
+}

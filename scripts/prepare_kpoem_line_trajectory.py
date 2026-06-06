@@ -151,11 +151,15 @@ def add_conditioning_fields(
 
 def majority_trajectory(train_rows: list[dict[str, Any]], num_prefix_lines: int) -> list[str]:
     counters = [Counter() for _ in range(num_prefix_lines)]
+    overall: Counter = Counter()
     for row in train_rows:
-        for idx, label in enumerate(row["trajectory_labels"][:num_prefix_lines]):
+        labels = row["trajectory_labels"][:num_prefix_lines]
+        overall.update(labels)
+        for idx, label in enumerate(labels):
             counters[idx][label] += 1
+    fallback = overall.most_common(1)[0][0] if overall else "sadness"
     return [
-        counter.most_common(1)[0][0] if counter else "sadness"
+        counter.most_common(1)[0][0] if counter else fallback
         for counter in counters
     ]
 
@@ -165,19 +169,43 @@ def make_random_labels(seed: int, split: str, row_id: str, num_prefix_lines: int
     return [rng.choice(EMOTION_LABELS) for _ in range(num_prefix_lines)]
 
 
+def resplit_by_ratio(row: dict[str, Any], ratio: float) -> tuple[dict[str, Any], int]:
+    """Re-split prefix/target as the first `ratio` fraction of the poem's lines."""
+    lines = [line for line in row["full_text"].split("\n") if line.strip()]
+    n = len(lines)
+    n_prefix = max(1, min(n - 1, int(round(n * ratio))))
+    updated = dict(row)
+    updated["prefix"] = "\n".join(lines[:n_prefix])
+    updated["target"] = "\n".join(lines[n_prefix:])
+    updated["num_prefix_lines"] = n_prefix
+    return updated, n_prefix
+
+
 def process(args: argparse.Namespace) -> dict[str, Any]:
     line_metadata = load_line_metadata(args.raw_dir, args.mode, args.line_min_count)
+    ratio = args.prefix_ratio
+    suffix = f"_r{int(round(ratio * 100))}" if ratio > 0 else ""
 
     oracle_by_split: dict[str, list[dict[str, Any]]] = {}
     for split in ["train", "dev", "test"]:
         rows = read_jsonl(args.processed_dir / f"poem_ko_{split}.jsonl")
         oracle_rows = []
+        plain_rows = []
         for row in rows:
+            if ratio > 0:
+                row, n_prefix = resplit_by_ratio(row, ratio)
+                plain = dict(row)
+                plain["trajectory_policy"] = "none"
+                plain["model_input"] = row["prefix"]
+                plain["conditioned_full_text"] = row["full_text"]
+                plain_rows.append(plain)
+            else:
+                n_prefix = args.num_prefix_lines
             labels, details = prefix_line_trajectory(
                 row,
                 line_metadata,
                 mode=args.mode,
-                num_prefix_lines=args.num_prefix_lines,
+                num_prefix_lines=n_prefix,
             )
             oracle_rows.append(
                 add_conditioning_fields(
@@ -189,40 +217,39 @@ def process(args: argparse.Namespace) -> dict[str, Any]:
                 )
             )
         oracle_by_split[split] = oracle_rows
-        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj.jsonl", oracle_rows)
+        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj{suffix}.jsonl", oracle_rows)
+        if ratio > 0:
+            write_jsonl(args.processed_dir / f"poem_ko_{split}_plain{suffix}.jsonl", plain_rows)
 
-    avg_labels = majority_trajectory(oracle_by_split["train"], args.num_prefix_lines)
-    avg_details = [
-        {
-            "position": idx + 1,
-            "label": label,
-            "source": "train_majority_trajectory",
-        }
-        for idx, label in enumerate(avg_labels)
-    ]
+    max_prefix_len = max(len(row["trajectory_labels"]) for row in oracle_by_split["train"])
+    avg_labels = majority_trajectory(oracle_by_split["train"], max_prefix_len)
 
     random_by_split: dict[str, list[dict[str, Any]]] = {}
     avg_by_split: dict[str, list[dict[str, Any]]] = {}
     for split, rows in oracle_by_split.items():
-        avg_rows = [
-            add_conditioning_fields(
-                row,
-                avg_labels,
-                avg_details,
-                policy="train_average_prefix_line",
-                language=args.language,
-            )
-            for row in rows
-        ]
+        avg_rows = []
         random_rows = []
         for row in rows:
-            labels = make_random_labels(args.seed, split, row["id"], args.num_prefix_lines)
+            row_n = len(row["trajectory_labels"])
+            # average trajectory truncated/padded (with its last label) to this row's prefix length
+            row_avg = (avg_labels + [avg_labels[-1]] * row_n)[:row_n]
+            avg_details = [
+                {"position": idx + 1, "label": label, "source": "train_majority_trajectory"}
+                for idx, label in enumerate(row_avg)
+            ]
+            avg_rows.append(
+                add_conditioning_fields(
+                    row,
+                    row_avg,
+                    avg_details,
+                    policy="train_average_prefix_line",
+                    language=args.language,
+                )
+            )
+
+            labels = make_random_labels(args.seed, split, row["id"], row_n)
             details = [
-                {
-                    "position": idx + 1,
-                    "label": label,
-                    "source": "deterministic_random",
-                }
+                {"position": idx + 1, "label": label, "source": "deterministic_random"}
                 for idx, label in enumerate(labels)
             ]
             random_rows.append(
@@ -237,13 +264,15 @@ def process(args: argparse.Namespace) -> dict[str, Any]:
 
         avg_by_split[split] = avg_rows
         random_by_split[split] = random_rows
-        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj_avg.jsonl", avg_rows)
-        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj_random.jsonl", random_rows)
+        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj_avg{suffix}.jsonl", avg_rows)
+        write_jsonl(args.processed_dir / f"poem_ko_{split}_line_traj_random{suffix}.jsonl", random_rows)
 
     summary = {
         "mode": args.mode,
         "line_min_count": args.line_min_count,
         "num_prefix_lines": args.num_prefix_lines,
+        "prefix_ratio": ratio,
+        "max_prefix_len": max_prefix_len,
         "language": args.language,
         "average_trajectory": avg_labels,
         "average_trajectory_ko": [KO_EMOTION_LABELS[label] for label in avg_labels],
@@ -261,7 +290,7 @@ def process(args: argparse.Namespace) -> dict[str, Any]:
             "line_fallback_count": fallback_count,
         }
 
-    output_path = args.processed_dir / "kpoem_line_trajectory_summary.json"
+    output_path = args.processed_dir / f"kpoem_line_trajectory_summary{suffix}.json"
     output_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary
 
@@ -273,6 +302,8 @@ def main() -> None:
     parser.add_argument("--mode", choices=["strict", "poetic"], default="poetic")
     parser.add_argument("--line_min_count", type=int, default=1)
     parser.add_argument("--num_prefix_lines", type=int, default=3)
+    parser.add_argument("--prefix_ratio", type=float, default=0.0,
+                        help="if >0, split prefix/target by this fraction of lines instead of a fixed line count")
     parser.add_argument("--language", choices=["ko", "en"], default="ko")
     parser.add_argument("--seed", type=int, default=11711)
     args = parser.parse_args()

@@ -273,8 +273,8 @@ def footer(canvas, doc):
     canvas.drawRightString(A4[0] - 18 * mm, 12 * mm, 'GPT-2 Downstream Task 실험 보고서')
     canvas.restoreState()
 
-doc = SimpleDocTemplate('NLP_GPT2_실험_보고서.pdf', pagesize=A4,
+doc = SimpleDocTemplate('docs/NLP_GPT2_실험_보고서.pdf', pagesize=A4,
                         leftMargin=20*mm, rightMargin=20*mm, topMargin=18*mm, bottomMargin=20*mm,
                         title='GPT-2 Downstream Task 실험 보고서')
 doc.build(story, onFirstPage=footer, onLaterPages=footer)
-print('PDF 생성 완료: NLP_GPT2_실험_보고서.pdf')
+print('PDF 생성 완료: docs/NLP_GPT2_실험_보고서.pdf')

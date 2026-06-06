@@ -1,0 +1,15 @@
+{
+  "setup_id": "E2",
+  "lang": "en",
+  "ckpt": "poem_en_E2.pt",
+  "eval_n": 12,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "random",
+  "chrf_continuation": 26.406475042617767,
+  "chrf_full_poem": 40.96872859376515
+}
