@@ -1,0 +1,15 @@
+{
+  "setup_id": "R3K_fine",
+  "lang": "ko",
+  "ckpt": "checkpoints/round3_curve/poem_ko_R3K_fine.pt",
+  "eval_n": 11,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 6.498913830668091,
+  "chrf_full_poem": 19.800314208285865
+}

@@ -1,0 +1,15 @@
+{
+  "setup_id": "R3_orc_m",
+  "lang": "en",
+  "ckpt": "checkpoints/round3_curve/poem_en_R3_orc_m.pt",
+  "eval_n": 11,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 25.2903781250469,
+  "chrf_full_poem": 40.53812593576932
+}

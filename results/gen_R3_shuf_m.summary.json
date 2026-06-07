@@ -1,0 +1,15 @@
+{
+  "setup_id": "R3_shuf_m",
+  "lang": "en",
+  "ckpt": "checkpoints/round3_curve/poem_en_R3_shuf_m.pt",
+  "eval_n": 11,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 27.08192269000075,
+  "chrf_full_poem": 41.56132824858332
+}

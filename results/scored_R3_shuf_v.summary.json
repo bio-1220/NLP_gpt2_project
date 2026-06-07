@@ -1,0 +1,14 @@
+{
+  "gen_file": "results/gen_R3_shuf_v.jsonl",
+  "lang": "en",
+  "n_records": 11,
+  "metrics": {
+    "chrf": 26.144246775420093,
+    "distinct1": 0.4979382834125617,
+    "distinct2": 0.7849902729649003,
+    "bertscore_f1": 0.8256648453799161,
+    "traj_mse": 1.7650349593916013,
+    "traj_corr": 0.0573923988777733,
+    "volta_dist": 5.121212121212121
+  }
+}

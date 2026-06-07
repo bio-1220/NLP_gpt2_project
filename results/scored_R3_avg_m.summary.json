@@ -1,0 +1,14 @@
+{
+  "gen_file": "results/gen_R3_avg_m.jsonl",
+  "lang": "en",
+  "n_records": 11,
+  "metrics": {
+    "chrf": 24.88480347888781,
+    "distinct1": 0.5128850593465538,
+    "distinct2": 0.7752085536188529,
+    "bertscore_f1": 0.8259541031086084,
+    "traj_mse": 1.8216297810753614,
+    "traj_corr": 0.011545690530780792,
+    "volta_dist": 3.515151515151515
+  }
+}

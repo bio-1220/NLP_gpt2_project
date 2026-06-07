@@ -1,0 +1,14 @@
+{
+  "gen_file": "results/gen_R3_base.jsonl",
+  "lang": "en",
+  "n_records": 11,
+  "metrics": {
+    "chrf": 27.691374522923965,
+    "distinct1": 0.5461629032907431,
+    "distinct2": 0.8398631006406219,
+    "bertscore_f1": 0.8330875093286687,
+    "traj_mse": 1.7154804677188218,
+    "traj_corr": -0.020165825296519068,
+    "volta_dist": 4.575757575757576
+  }
+}

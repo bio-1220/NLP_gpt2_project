@@ -1,0 +1,14 @@
+{
+  "gen_file": "results/gen_R3_orc_v.jsonl",
+  "lang": "en",
+  "n_records": 11,
+  "metrics": {
+    "chrf": 25.386653699043073,
+    "distinct1": 0.5194389621256987,
+    "distinct2": 0.7973932328860615,
+    "bertscore_f1": 0.8272620132475188,
+    "traj_mse": 1.9574293841001194,
+    "traj_corr": -0.14649076696053168,
+    "volta_dist": 4.515151515151516
+  }
+}

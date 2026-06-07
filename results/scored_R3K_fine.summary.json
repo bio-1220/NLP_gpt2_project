@@ -1,0 +1,15 @@
+{
+  "gen_file": "results/gen_R3K_fine.jsonl",
+  "lang": "ko",
+  "n_records": 11,
+  "metrics": {
+    "chrf": 6.498913830668091,
+    "distinct1": 0.9164111840221337,
+    "distinct2": 0.999285245333795,
+    "bertscore_f1": 0.6137518738255356,
+    "traj_mse": 1.894214876033058,
+    "traj_corr": -0.025428732227874472,
+    "volta_dist": 1.7272727272727273,
+    "line_emotion_agreement": 0.247910927456382
+  }
+}

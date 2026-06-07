@@ -1,0 +1,15 @@
+{
+  "setup_id": "R3_avg_v",
+  "lang": "en",
+  "ckpt": "checkpoints/round3_curve/poem_en_R3_avg_v.pt",
+  "eval_n": 11,
+  "n_samples": 3,
+  "decoding": {
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "max_new_tokens": 200
+  },
+  "emotion_prefix": "none",
+  "chrf_continuation": 25.860765614068328,
+  "chrf_full_poem": 40.72356792747723
+}
