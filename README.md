@@ -1,6 +1,6 @@
 # GPT-2 Implementation and Emotion-Conditioned Bilingual Poetry Generation
 
-*CSE5321 Final Project — Jihong Park, Jiwoo Lee, Hyeongwon Jo (Sogang University)*
+*CSEG321 Final Project — Jihong Park, Jeewu Lee, Hyeongwon Jo (Sogang University)*
 
 A from-scratch GPT-2 (English, ~124M) and KoGPT2 (Korean) project that:
 
