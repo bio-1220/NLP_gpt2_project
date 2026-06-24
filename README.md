@@ -9,6 +9,8 @@ A from-scratch GPT-2 (English, ~124M) and KoGPT2 (Korean) project that:
 
 > **Main finding:** Providing the complete oracle emotion curve at both training and inference time — across 3 English sentiment scales and Korean 44-/6-class label resolutions — did **not** beat the unconditioned baseline on continuation quality (chrF / BERTScore). The oracle curve was indistinguishable from a shuffled curve (no content signal), and in Korean the model given the oracle emotion sequence actually followed the emotion flow *less* well. The only reproducible effect was improved Volta (emotional turning-point) placement from the train-average curve — a structural prior, not poem-specific content.
 
+Final report PDF: [`report/final_report.pdf`](report/final_report.pdf)
+
 ---
 
 ## Setup

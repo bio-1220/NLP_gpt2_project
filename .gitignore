@@ -21,7 +21,4 @@ __pycache__/
 
 report/assets/
 report/REPORT_HANDOFF.md
-report/COLM_2024_Official_Template/colm2024_conference.bib
-report/COLM_2024_Official_Template/colm2024_conference.pdf
-report/COLM_2024_Official_Template/colm2024_conference.tex
-report/COLM_2024_Official_Template/*preview*.png
+report/COLM_2024_Official_Template/
