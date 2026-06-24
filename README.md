@@ -11,6 +11,8 @@ A from-scratch GPT-2 (English, ~124M) and KoGPT2 (Korean) project that:
 
 Final report PDF: [`report/final_report.pdf`](report/final_report.pdf)
 
+Repository note: generated checkpoints, logs, full prediction CSVs, and full generation JSONL files are intentionally omitted. The repository keeps the implementation, data-preparation/evaluation scripts, the final report, and compact final-experiment summary files under `results/`.
+
 ---
 
 ## Setup
