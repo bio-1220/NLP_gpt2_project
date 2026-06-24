@@ -102,7 +102,7 @@ Common settings: 10 epochs, custom AdamW, best-dev checkpoint, seed 11711. Score
 | Paraphrase | Quora (283k) | full | 1e-5 | 32 | **0.896** | 0.889 |
 | Sonnet gen | Shakespeare (131 poems) | full | 1e-5 | 8 | chrF 27.7–27.8 | — |
 
-Full fine-tuning beats last-linear on both classifiers (+0.069 / +0.114), which is why full fine-tuning is fixed for all later experiments. Details: `docs/NLP_GPT2_실험_보고서.pdf`.
+Full fine-tuning beats last-linear on both classifiers (+0.069 / +0.114), which is why full fine-tuning is fixed for all later experiments. 
 
 ### Final experiment
 
